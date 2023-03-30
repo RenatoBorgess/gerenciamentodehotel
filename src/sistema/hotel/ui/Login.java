@@ -1,4 +1,4 @@
-package sistema.hotel;
+package sistema.hotel.ui;
 
 import java.awt.Color;
 import java.awt.EventQueue;

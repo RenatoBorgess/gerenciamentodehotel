@@ -1,4 +1,4 @@
-package sistema.hotel;
+package sistema.hotel.ui;
 
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -26,6 +26,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
 import com.toedter.calendar.JDateChooser;
+
+import sistema.hotel.service.RegistroHospede;
 
 
 @SuppressWarnings("serial")

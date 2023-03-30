@@ -1,4 +1,4 @@
-package sistema.hotel;
+package sistema.hotel.repository;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

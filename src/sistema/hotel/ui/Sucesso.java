@@ -1,4 +1,4 @@
-package sistema.hotel;
+package sistema.hotel.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

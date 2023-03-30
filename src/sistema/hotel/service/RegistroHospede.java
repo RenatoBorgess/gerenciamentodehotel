@@ -1,4 +1,4 @@
-package sistema.hotel;
+package sistema.hotel.service;
 
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -22,6 +22,9 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import com.toedter.calendar.JDateChooser;
+
+import sistema.hotel.ui.MenuPrincipal;
+import sistema.hotel.ui.ReservasView;
 
 @SuppressWarnings("serial")
 public class RegistroHospede extends JFrame {
