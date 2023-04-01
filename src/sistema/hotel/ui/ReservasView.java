@@ -17,6 +17,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.Format;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
@@ -47,7 +49,9 @@ public class ReservasView extends JFrame {
 	private JLabel labelExit;
 	private JLabel lblValorSimbolo;
 	private JLabel labelAtras;
+	private Long numReserva;
 	private static final String SQL_INSERT = "INSERT INTO reservas (dataentrada, datasaida, valor, formapagamento) VALUES (?,?,?,?)";
+	
 	/**
 	 * Launch the application.
 	 */
@@ -148,15 +152,10 @@ public class ReservasView extends JFrame {
 		txtDataS.getCalendarButton().setBounds(267, 1, 21, 31);
 		txtDataS.setBackground(Color.WHITE);
 		txtDataS.setFont(new Font("Roboto", Font.PLAIN, 18));
-		txtDataS.addPropertyChangeListener(new PropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent evt) {
-				// Ativa o evento, após o usuário selecionar as datas, o valor da reserva deve
-				// ser calculado
-			}
-		});
 		txtDataS.setDateFormatString("yyyy-MM-dd");
 		txtDataS.getCalendarButton().setBackground(SystemColor.textHighlight);
 		txtDataS.setBorder(new LineBorder(new Color(255, 255, 255), 0));
+		
 		panel.add(txtDataS);
 
 		txtValor = new JTextField();
@@ -169,6 +168,7 @@ public class ReservasView extends JFrame {
 		txtValor.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 		panel.add(txtValor);
 		txtValor.setColumns(10);
+		txtValor.setText("3 Reais");
 
 		JLabel lblValor = new JLabel("VALOR DA RESERVA");
 		lblValor.setForeground(SystemColor.textInactiveText);
@@ -309,39 +309,37 @@ public class ReservasView extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				java.sql.Date sqlDate = new java.sql.Date(txtDataE.getDate().getTime());
-				java.sql.Date sqlDate1= new java.sql.Date(txtDataS.getDate().getTime());
+				java.sql.Date sqlDate1 = new java.sql.Date(txtDataS.getDate().getTime());
 				String pagamento = txtFormaPagamento.getSelectedItem().toString();
-				
-				
-				
+
 				try {
 					Connection conexao = DriverManager.getConnection("jdbc:mysql://localhost/mydb", "root",
 							"!Rerbinha471");
 
-					PreparedStatement preparedStatement = (PreparedStatement) conexao.prepareStatement(SQL_INSERT,  Statement.RETURN_GENERATED_KEYS) ;
+					PreparedStatement preparedStatement = (PreparedStatement) conexao.prepareStatement(SQL_INSERT,
+							Statement.RETURN_GENERATED_KEYS);
 					preparedStatement.setDate(1, sqlDate);
 					preparedStatement.setDate(2, sqlDate1);
 					preparedStatement.setInt(3, 2);
 					preparedStatement.setString(4, pagamento);
 					preparedStatement.execute();
-					
-					ResultSet resultSet = preparedStatement.getGeneratedKeys();
-					
-				    while(resultSet.next()){
-				        System.out.println(resultSet.getLong(1));
-				    }
-					System.out.println("funcionou o bagui");
 
-				if (ReservasView.txtDataE.getDate() != null && ReservasView.txtDataS.getDate() != null) {
-					RegistroHospede registro = new RegistroHospede();
-					registro.setVisible(true);
-				} else {
-					JOptionPane.showMessageDialog(null, "Deve preencher todos os campos.");
-				}
+					ResultSet resultSet = preparedStatement.getGeneratedKeys();
+
+					while (resultSet.next()) {
+						Long numReserva = resultSet.getLong(1);
+					}
+					if (ReservasView.txtDataE.getDate() != null && ReservasView.txtDataS.getDate() != null) {
+						RegistroHospede registro = new RegistroHospede();
+						registro.setVisible(true);
+					} else {
+						JOptionPane.showMessageDialog(null, "Deve preencher todos os campos.");
+					}
 				} catch (SQLException ex) {
 					System.out.println("Ocorreu um erro ao acessar o BD " + ex.getMessage());
 					ex.printStackTrace();
-				}}
+				}
+			}
 		});
 		btnProximo.setLayout(null);
 		btnProximo.setBackground(SystemColor.textHighlight);

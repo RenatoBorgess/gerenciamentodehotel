@@ -11,10 +11,10 @@ import java.awt.event.MouseMotionAdapter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.Format;
-import java.util.Date;
-import java.util.concurrent.atomic.AtomicLong;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
@@ -31,6 +31,7 @@ import com.toedter.calendar.JDateChooser;
 
 import sistema.hotel.ui.MenuPrincipal;
 import sistema.hotel.ui.ReservasView;
+import sistema.hotel.ui.Sucesso;
 
 @SuppressWarnings("serial")
 public class RegistroHospede extends JFrame {
@@ -45,9 +46,9 @@ public class RegistroHospede extends JFrame {
 	private JLabel labelExit;
 	private JLabel labelAtras;
 	int xMouse, yMouse;
-	private AtomicLong contador;
+	private String reserva;
 	private static final String SQL_INSERT = "INSERT INTO HOSPEDES (NOME, SOBRENOME, DATANASCIMENTO, NASCIONALIDADE, TELEFONE) VALUES (?,?,?,?,?)";
-
+	private static final String SQL_BUSCA = "SELECT * FROM RESERVAS"; 
 	/**
 	 * Launch the application.
 	 */
@@ -272,9 +273,26 @@ public class RegistroHospede extends JFrame {
 		lblNumeroReserva.setBounds(560, 474, 253, 14);
 		lblNumeroReserva.setForeground(SystemColor.textInactiveText);
 		lblNumeroReserva.setFont(new Font("Roboto Black", Font.PLAIN, 18));
-		contentPane.add(lblNumeroReserva);
-
+		contentPane.add(lblNumeroReserva);	
 		txtNreserva = new JTextField();
+		try {
+			Connection conexao = DriverManager.getConnection("jdbc:mysql://localhost/mydb", "root",
+					"!Rerbinha471");
+			PreparedStatement preparedStatement = (PreparedStatement) conexao.prepareStatement(SQL_BUSCA,
+					Statement.RETURN_GENERATED_KEYS);
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			while (resultSet.next()) {
+				Long id = resultSet.getLong(1);
+				
+				txtNreserva.setText(id.toString());
+				
+		} } catch (SQLException e1) {
+			System.out.println("deu m :");
+			e1.printStackTrace();
+			
+		}
+		;
 		txtNreserva.setFont(new Font("Roboto", Font.PLAIN, 16));
 		txtNreserva.setBounds(560, 495, 285, 33);
 		txtNreserva.setColumns(10);
@@ -340,13 +358,19 @@ public class RegistroHospede extends JFrame {
 					preparedStatement.setDate(3, sqlDate);
 					preparedStatement.setString(4, nacionalidade);
 					preparedStatement.setInt(5, telefone);
-					preparedStatement.execute();
+					preparedStatement.execute();	
 					
+					 
+					conexao.close();
+						
 
 				} catch (SQLException ex) {
 					System.out.println("Ocorreu um erro ao acessar o BD " + ex.getMessage());
 					ex.printStackTrace();
 				}
+				Sucesso sucesso = new Sucesso();
+				sucesso.setVisible(true);
+				dispose();
 			}
 		});
 		btnsalvar.setLayout(null);
