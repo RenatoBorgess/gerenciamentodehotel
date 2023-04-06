@@ -7,21 +7,20 @@ import java.sql.Statement;
 
 public class Conexao {
 
-	public static void main(String[] args) {
+	private static String username = "root";
+	private static String password = "!Rerbinha471";
+	private static Connection con;
+	private static String urlstring = "jdbc:mysql://localhost/mydb";
+
+	public static Connection getConnection() {
+
 		try {
-
-			Connection conexao = DriverManager.getConnection("jdbc:mysql://localhost", "root", "!Rerbinha471");
-			System.out.println("Conectou");
-
-			Statement stmt = conexao.createStatement();
-			{
-				conexao.close();
-			}
-		} catch (SQLException e) {
-			System.out.println("Ocorreu um erro ao acessar o BD" + e.getMessage());
-			e.printStackTrace();
-
+			con = DriverManager.getConnection(urlstring, username, password);
+		} catch (SQLException ex) {
+			System.out.println("Failed to create the database connection.");
 		}
+		return con;
 
 	}
+
 }

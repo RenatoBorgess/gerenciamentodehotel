@@ -46,7 +46,6 @@ public class RegistroHospede extends JFrame {
 	private JLabel labelExit;
 	private JLabel labelAtras;
 	int xMouse, yMouse;
-	private String reserva;
 	private static final String SQL_INSERT = "INSERT INTO HOSPEDES (NOME, SOBRENOME, DATANASCIMENTO, NASCIONALIDADE, TELEFONE) VALUES (?,?,?,?,?)";
 	private static final String SQL_BUSCA = "SELECT * FROM RESERVAS"; 
 	/**

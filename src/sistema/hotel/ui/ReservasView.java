@@ -11,7 +11,6 @@ import java.awt.event.MouseMotionAdapter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -35,6 +34,7 @@ import javax.swing.border.LineBorder;
 
 import com.toedter.calendar.JDateChooser;
 
+import sistema.hotel.repository.Conexao;
 import sistema.hotel.service.RegistroHospede;
 
 @SuppressWarnings("serial")
@@ -51,7 +51,10 @@ public class ReservasView extends JFrame {
 	private JLabel labelAtras;
 	private Long numReserva;
 	private static final String SQL_INSERT = "INSERT INTO reservas (dataentrada, datasaida, valor, formapagamento) VALUES (?,?,?,?)";
-	
+	private Connection con = null;
+	private Statement stmt = null;
+	private ResultSet rs = null;
+
 	/**
 	 * Launch the application.
 	 */
@@ -120,7 +123,7 @@ public class ReservasView extends JFrame {
 		txtDataE.getCalendarButton().setBounds(268, 0, 21, 33);
 		txtDataE.setBackground(Color.WHITE);
 		txtDataE.setBorder(new LineBorder(SystemColor.window));
-		txtDataE.setDateFormatString("yyyy-MM-dd");
+		txtDataE.setDateFormatString("MM/dd/yyyy");
 		txtDataE.setFont(new Font("Roboto", Font.PLAIN, 18));
 		panel.add(txtDataE);
 
@@ -152,10 +155,23 @@ public class ReservasView extends JFrame {
 		txtDataS.getCalendarButton().setBounds(267, 1, 21, 31);
 		txtDataS.setBackground(Color.WHITE);
 		txtDataS.setFont(new Font("Roboto", Font.PLAIN, 18));
-		txtDataS.setDateFormatString("yyyy-MM-dd");
+		txtDataS.setDateFormatString("MM/dd/yyyy");
 		txtDataS.getCalendarButton().setBackground(SystemColor.textHighlight);
 		txtDataS.setBorder(new LineBorder(new Color(255, 255, 255), 0));
-		
+		txtDataS.addPropertyChangeListener((PropertyChangeListener) new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				if ("date".equals(evt.getPropertyName())) {
+					Date date1 = txtDataE.getDate();
+					Date date2 = txtDataS.getDate();
+					long diffInMillies = Math.abs(date2.getTime() - date1.getTime());
+				    long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+				    long price = (diff * 10);
+				    txtValor.setText(Long.toString(price) + ",00");
+
+				}
+			}
+		});
 		panel.add(txtDataS);
 
 		txtValor = new JTextField();
@@ -168,8 +184,7 @@ public class ReservasView extends JFrame {
 		txtValor.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 		panel.add(txtValor);
 		txtValor.setColumns(10);
-		txtValor.setText("3 Reais");
-
+		
 		JLabel lblValor = new JLabel("VALOR DA RESERVA");
 		lblValor.setForeground(SystemColor.textInactiveText);
 		lblValor.setBounds(72, 303, 196, 14);
@@ -313,22 +328,16 @@ public class ReservasView extends JFrame {
 				String pagamento = txtFormaPagamento.getSelectedItem().toString();
 
 				try {
-					Connection conexao = DriverManager.getConnection("jdbc:mysql://localhost/mydb", "root",
-							"!Rerbinha471");
+					con = Conexao.getConnection();
+					System.out.println("conectou");
 
-					PreparedStatement preparedStatement = (PreparedStatement) conexao.prepareStatement(SQL_INSERT,
-							Statement.RETURN_GENERATED_KEYS);
+					PreparedStatement preparedStatement = (PreparedStatement) con.prepareStatement(SQL_INSERT);
 					preparedStatement.setDate(1, sqlDate);
 					preparedStatement.setDate(2, sqlDate1);
-					preparedStatement.setInt(3, 2);
+					preparedStatement.setInt(3, 3);
 					preparedStatement.setString(4, pagamento);
 					preparedStatement.execute();
 
-					ResultSet resultSet = preparedStatement.getGeneratedKeys();
-
-					while (resultSet.next()) {
-						Long numReserva = resultSet.getLong(1);
-					}
 					if (ReservasView.txtDataE.getDate() != null && ReservasView.txtDataS.getDate() != null) {
 						RegistroHospede registro = new RegistroHospede();
 						registro.setVisible(true);
@@ -340,6 +349,7 @@ public class ReservasView extends JFrame {
 					ex.printStackTrace();
 				}
 			}
+
 		});
 		btnProximo.setLayout(null);
 		btnProximo.setBackground(SystemColor.textHighlight);
